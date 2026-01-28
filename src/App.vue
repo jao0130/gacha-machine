@@ -363,9 +363,9 @@ function getRandomColor(index: number) {
 </script>
 
 <template>
-  <div class="app-container min-h-[100dvh] h-[100dvh] text-white overflow-hidden dark">
+  <div class="app-container fixed inset-0 text-white overflow-hidden dark touch-manipulation">
     <!-- 深暖色背景 - 填滿整個視窗 -->
-    <div class="fixed inset-0 bg-[#0d0b0a]">
+    <div class="absolute inset-0 bg-[#0d0b0a]">
       <!-- 微妙的暖色光暈 -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-900/15 rounded-full blur-[120px]"></div>
       <div class="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-orange-950/20 rounded-full blur-[100px]"></div>
@@ -376,7 +376,7 @@ function getRandomColor(index: number) {
     <!-- 階段一：輸入介面 -->
     <div
       v-if="currentPage === 'input'"
-      class="min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-center relative z-10 px-6 py-4 overflow-y-auto"
+      class="absolute inset-0 flex flex-col items-center justify-center z-10 px-6 py-4 overflow-y-auto overscroll-none"
       :class="`theme-${currentUITheme}`"
     >
       <!-- 主題切換按鈕 -->
@@ -668,7 +668,7 @@ function getRandomColor(index: number) {
     </div>
 
     <!-- 階段二：扭蛋機介面 -->
-    <div v-if="currentPage === 'machine'" class="min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-center p-6 relative z-10 overflow-visible">
+    <div v-if="currentPage === 'machine'" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 overflow-visible overscroll-none">
       <!-- 可替換背景圖片 -->
       <div class="machine-bg absolute inset-0" :class="`machine-bg-${machineStyle}`"></div>
 
@@ -714,10 +714,11 @@ function getRandomColor(index: number) {
         </div>
       </div>
 
-      <!-- 扭蛋機主體 -->
+      <!-- 扭蛋機主體（點擊整台機器即可抽獎） -->
       <div
-        class="relative z-10 overflow-visible"
-        :class="{ 'animate-shake-intense': isShaking }"
+        class="relative z-10 overflow-visible cursor-pointer"
+        :class="{ 'animate-shake-intense': isShaking, 'pointer-events-none': isPulling || isShaking || isDropping }"
+        @click="spin"
       >
         <!-- 機器頂蓋 -->
         <div class="machine-top" :class="`machine-top-${machineStyle}`">
@@ -777,12 +778,9 @@ function getRandomColor(index: number) {
           <div class="absolute inset-x-2 bottom-2 h-1 bg-black/30 rounded-full"></div>
         </div>
 
-        <!-- 拉霸式拉桿（位於機身右側） -->
-        <button
-          @click="spin"
-          :disabled="isPulling || isShaking || isDropping"
-          class="slot-lever"
-          :class="{ 'cursor-not-allowed': isPulling || isShaking || isDropping }"
+        <!-- 拉霸式拉桿（純視覺裝飾） -->
+        <div
+          class="slot-lever pointer-events-none"
         >
           <!-- 底座（固定不動） -->
           <div class="lever-base"></div>
@@ -800,7 +798,7 @@ function getRandomColor(index: number) {
           >
             <div class="lever-ball-shine"></div>
           </div>
-        </button>
+        </div>
 
         <!-- 底座陰影 -->
         <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-72 h-6 bg-black/40 rounded-[50%] blur-md"></div>
@@ -823,7 +821,7 @@ function getRandomColor(index: number) {
            'text-pink-400/90': machineStyle === 'candy',
            'text-emerald-400/90': machineStyle === 'retro'
          }">
-        <span class="text-2xl">👇</span> 拉下拉桿開始抽獎！
+        <span class="text-2xl">👆</span> 點擊扭蛋機開始抽獎！
       </p>
 
       <!-- 返回按鈕 -->
@@ -838,7 +836,7 @@ function getRandomColor(index: number) {
     <!-- 階段三：結果介面 -->
     <div
       v-if="currentPage === 'result'"
-      class="min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-center relative z-10 px-6"
+      class="absolute inset-0 flex flex-col items-center justify-center z-10 px-6 overscroll-none"
       :class="`theme-${currentUITheme}`"
     >
       <!-- 背景裝飾 -->
@@ -1551,10 +1549,16 @@ function getRandomColor(index: number) {
   left: 50%;
   z-index: 100;
   animation: capsule-drop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  box-shadow:
-    0 8px 24px rgba(0,0,0,0.4);
+  -webkit-animation: capsule-drop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   overflow: hidden;
   background: transparent;
+  /* iOS 硬體加速 */
+  will-change: transform, opacity;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* 上半透明部分 */
@@ -1657,28 +1661,54 @@ function getRandomColor(index: number) {
   border: 3px solid rgba(236,72,153,0.5);
 }
 
-@keyframes capsule-drop {
+@-webkit-keyframes capsule-drop {
   0% {
-    /* 從出口誕生，從無到有 */
-    transform: translateX(-50%) scale(0);
+    -webkit-transform: translate3d(-50%, 0, 0) scale(0);
+    transform: translate3d(-50%, 0, 0) scale(0);
     opacity: 0;
   }
   10% {
-    /* 快速出現在出口 */
-    transform: translateX(-50%) scale(0.8);
+    -webkit-transform: translate3d(-50%, 0, 0) scale(0.8);
+    transform: translate3d(-50%, 0, 0) scale(0.8);
     opacity: 1;
   }
   25% {
-    /* 稍微放大，準備彈出 */
-    transform: translateX(-50%) scale(1.1);
+    -webkit-transform: translate3d(-50%, 0, 0) scale(1.1);
+    transform: translate3d(-50%, 0, 0) scale(1.1);
   }
   40% {
-    /* 輕微下沉蓄力 */
-    transform: translateX(-50%) translateY(5px) scale(1);
+    -webkit-transform: translate3d(-50%, 5px, 0) scale(1);
+    transform: translate3d(-50%, 5px, 0) scale(1);
   }
   100% {
-    /* 飛向螢幕中央，放大 */
-    transform: translateX(-50%) translateY(-280px) scale(3);
+    -webkit-transform: translate3d(-50%, -280px, 0) scale(3);
+    transform: translate3d(-50%, -280px, 0) scale(3);
+    opacity: 1;
+  }
+}
+
+@keyframes capsule-drop {
+  0% {
+    -webkit-transform: translate3d(-50%, 0, 0) scale(0);
+    transform: translate3d(-50%, 0, 0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    -webkit-transform: translate3d(-50%, 0, 0) scale(0.8);
+    transform: translate3d(-50%, 0, 0) scale(0.8);
+    opacity: 1;
+  }
+  25% {
+    -webkit-transform: translate3d(-50%, 0, 0) scale(1.1);
+    transform: translate3d(-50%, 0, 0) scale(1.1);
+  }
+  40% {
+    -webkit-transform: translate3d(-50%, 5px, 0) scale(1);
+    transform: translate3d(-50%, 5px, 0) scale(1);
+  }
+  100% {
+    -webkit-transform: translate3d(-50%, -280px, 0) scale(3);
+    transform: translate3d(-50%, -280px, 0) scale(3);
     opacity: 1;
   }
 }
