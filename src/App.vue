@@ -101,28 +101,26 @@ function createDefaultPresets() {
     hasChanges = true
   }
 
-  // 台北捷運
+  // 台北捷運（含路線代號）
   if (!savedPresets.value.some(p => p.id === 'default-taipei-mrt')) {
     const mrtStations = [
-      // 文湖線
-      '動物園', '木柵', '萬芳社區', '萬芳醫院', '辛亥', '麟光', '六張犁', '科技大樓', '大安', '忠孝復興', '南京復興', '中山國中', '松山機場', '大直', '劍南路', '西湖', '港墘', '文德', '內湖', '大湖公園', '葫洲', '東湖', '南港軟體園區', '南港展覽館',
-      // 淡水信義線
-      '淡水', '紅樹林', '竹圍', '關渡', '忠義', '復興崗', '北投', '新北投', '奇岩', '唭哩岸', '石牌', '明德', '芝山', '士林', '劍潭', '圓山', '民權西路', '雙連', '中山', '台北車站', '台大醫院', '中正紀念堂', '東門', '大安森林公園', '信義安和', '台北101/世貿', '象山',
-      // 松山新店線
-      '松山', '南京三民', '台北小巨蛋', '南京復興', '松江南京', '中山', '北門', '西門', '小南門', '中正紀念堂', '古亭', '台電大樓', '公館', '萬隆', '景美', '大坪林', '七張', '新店區公所', '新店',
-      // 中和新蘆線
-      '南勢角', '景安', '永安市場', '頂溪', '古亭', '東門', '忠孝新生', '松江南京', '行天宮', '中山國小', '民權西路', '大橋頭', '台北橋', '菜寮', '三重', '先嗇宮', '頭前庄', '新莊', '輔大', '丹鳳', '迴龍', '三重國小', '三和國中', '徐匯中學', '三民高中', '蘆洲',
-      // 板南線
-      '頂埔', '永寧', '土城', '海山', '亞東醫院', '府中', '板橋', '新埔', '江子翠', '龍山寺', '西門', '台北車站', '善導寺', '忠孝新生', '忠孝復興', '忠孝敦化', '國父紀念館', '市政府', '永春', '後山埤', '昆陽', '南港', '南港展覽館',
-      // 環狀線
-      '新北產業園區', '幸福', '中原', '橋和', '中和', '景安', '景平', '秀朗橋', '十四張', '大坪林', '新店區公所', '板橋', '板新', '頭前庄'
+      // 文湖線 BR (Brown)
+      'BR-動物園', 'BR-木柵', 'BR-萬芳社區', 'BR-萬芳醫院', 'BR-辛亥', 'BR-麟光', 'BR-六張犁', 'BR-科技大樓', 'BR-大安', 'BR-忠孝復興', 'BR-南京復興', 'BR-中山國中', 'BR-松山機場', 'BR-大直', 'BR-劍南路', 'BR-西湖', 'BR-港墘', 'BR-文德', 'BR-內湖', 'BR-大湖公園', 'BR-葫洲', 'BR-東湖', 'BR-南港軟體園區', 'BR-南港展覽館',
+      // 淡水信義線 R (Red)
+      'R-淡水', 'R-紅樹林', 'R-竹圍', 'R-關渡', 'R-忠義', 'R-復興崗', 'R-北投', 'R-新北投', 'R-奇岩', 'R-唭哩岸', 'R-石牌', 'R-明德', 'R-芝山', 'R-士林', 'R-劍潭', 'R-圓山', 'R-民權西路', 'R-雙連', 'R-中山', 'R-台北車站', 'R-台大醫院', 'R-中正紀念堂', 'R-東門', 'R-大安森林公園', 'R-信義安和', 'R-台北101/世貿', 'R-象山',
+      // 松山新店線 G (Green)
+      'G-松山', 'G-南京三民', 'G-台北小巨蛋', 'G-南京復興', 'G-松江南京', 'G-中山', 'G-北門', 'G-西門', 'G-小南門', 'G-中正紀念堂', 'G-古亭', 'G-台電大樓', 'G-公館', 'G-萬隆', 'G-景美', 'G-大坪林', 'G-七張', 'G-新店區公所', 'G-新店',
+      // 中和新蘆線 O (Orange)
+      'O-南勢角', 'O-景安', 'O-永安市場', 'O-頂溪', 'O-古亭', 'O-東門', 'O-忠孝新生', 'O-松江南京', 'O-行天宮', 'O-中山國小', 'O-民權西路', 'O-大橋頭', 'O-台北橋', 'O-菜寮', 'O-三重', 'O-先嗇宮', 'O-頭前庄', 'O-新莊', 'O-輔大', 'O-丹鳳', 'O-迴龍', 'O-三重國小', 'O-三和國中', 'O-徐匯中學', 'O-三民高中', 'O-蘆洲',
+      // 板南線 BL (Blue)
+      'BL-頂埔', 'BL-永寧', 'BL-土城', 'BL-海山', 'BL-亞東醫院', 'BL-府中', 'BL-板橋', 'BL-新埔', 'BL-江子翠', 'BL-龍山寺', 'BL-西門', 'BL-台北車站', 'BL-善導寺', 'BL-忠孝新生', 'BL-忠孝復興', 'BL-忠孝敦化', 'BL-國父紀念館', 'BL-市政府', 'BL-永春', 'BL-後山埤', 'BL-昆陽', 'BL-南港', 'BL-南港展覽館',
+      // 環狀線 Y (Yellow)
+      'Y-新北產業園區', 'Y-幸福', 'Y-中原', 'Y-橋和', 'Y-中和', 'Y-景安', 'Y-景平', 'Y-秀朗橋', 'Y-十四張', 'Y-大坪林', 'Y-新店區公所', 'Y-板橋', 'Y-板新', 'Y-頭前庄'
     ]
-    // 去重
-    const uniqueStations = [...new Set(mrtStations)]
     savedPresets.value.push({
       id: 'default-taipei-mrt',
       name: '台北捷運',
-      options: uniqueStations.join('\n'),
+      options: mrtStations.join('\n'),
       createdAt: Date.now()
     })
     hasChanges = true
@@ -365,8 +363,8 @@ function getRandomColor(index: number) {
 </script>
 
 <template>
-  <div class="app-container min-h-screen text-white overflow-hidden dark">
-    <!-- 深暖色背景 -->
+  <div class="app-container min-h-[100dvh] h-[100dvh] text-white overflow-hidden dark">
+    <!-- 深暖色背景 - 填滿整個視窗 -->
     <div class="fixed inset-0 bg-[#0d0b0a]">
       <!-- 微妙的暖色光暈 -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-900/15 rounded-full blur-[120px]"></div>
@@ -378,7 +376,7 @@ function getRandomColor(index: number) {
     <!-- 階段一：輸入介面 -->
     <div
       v-if="currentPage === 'input'"
-      class="min-h-screen flex flex-col items-center justify-center relative z-10 px-6"
+      class="min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-center relative z-10 px-6 py-4 overflow-y-auto"
       :class="`theme-${currentUITheme}`"
     >
       <!-- 主題切換按鈕 -->
@@ -471,51 +469,48 @@ function getRandomColor(index: number) {
           />
         </el-card>
 
-        <!-- 底部操作區 - 置中 -->
-        <div class="space-y-4">
-          <!-- 存檔操作列 -->
-          <div class="flex justify-center gap-3">
-            <el-button
-              size="default"
-              class="action-btn flex-1 max-w-[100px]"
-              @click="showLoadDialog = true"
-            >
-              <el-icon class="mr-1" :size="14"><FolderOpened /></el-icon>
-              載入
-              <el-badge v-if="savedPresets.length > 0" :value="savedPresets.length" class="ml-1" type="warning" />
-            </el-button>
-            <el-button
-              size="default"
-              class="action-btn flex-1 max-w-[100px]"
-              :disabled="optionCount < 1"
-              @click="showSaveDialog = true"
-            >
-              <el-icon class="mr-1" :size="14"><DocumentAdd /></el-icon>
-              儲存
-            </el-button>
-            <el-button
-              size="default"
-              class="action-btn flex-1 max-w-[100px]"
-              :disabled="optionCount < 1"
-              @click="showProbabilityDialog = true"
-            >
-              <el-icon class="mr-1" :size="14"><DataLine /></el-icon>
-              機率
-            </el-button>
-          </div>
-
-          <!-- 開始按鈕 -->
+        <!-- 存檔操作列 -->
+        <div class="flex justify-center gap-3 mt-6 mb-6">
           <el-button
-            type="primary"
             size="default"
-            class="w-full start-btn-large"
-            :disabled="optionCount < 2"
-            @click="startMachine"
+            class="action-btn flex-1 max-w-[100px]"
+            @click="showLoadDialog = true"
           >
-            <el-icon class="mr-2" :size="18"><Promotion /></el-icon>
-            <span class="font-bold">開始抽獎</span>
+            <el-icon class="mr-1" :size="14"><FolderOpened /></el-icon>
+            載入
+            <el-badge v-if="savedPresets.length > 0" :value="savedPresets.length" class="ml-1" type="warning" />
+          </el-button>
+          <el-button
+            size="default"
+            class="action-btn flex-1 max-w-[100px]"
+            :disabled="optionCount < 1"
+            @click="showSaveDialog = true"
+          >
+            <el-icon class="mr-1" :size="14"><DocumentAdd /></el-icon>
+            儲存
+          </el-button>
+          <el-button
+            size="default"
+            class="action-btn flex-1 max-w-[100px]"
+            :disabled="optionCount < 1"
+            @click="showProbabilityDialog = true"
+          >
+            <el-icon class="mr-1" :size="14"><DataLine /></el-icon>
+            機率
           </el-button>
         </div>
+
+        <!-- 開始按鈕 -->
+        <el-button
+          type="primary"
+          size="default"
+          class="w-full start-btn-large"
+          :disabled="optionCount < 2"
+          @click="startMachine"
+        >
+          <el-icon class="mr-2" :size="18"><Promotion /></el-icon>
+          <span class="font-bold">開始抽獎</span>
+        </el-button>
       </div>
 
       <!-- 儲存對話框 -->
@@ -673,7 +668,7 @@ function getRandomColor(index: number) {
     </div>
 
     <!-- 階段二：扭蛋機介面 -->
-    <div v-if="currentPage === 'machine'" class="h-screen flex flex-col items-center justify-center p-6 relative z-10">
+    <div v-if="currentPage === 'machine'" class="min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-center p-6 relative z-10 overflow-visible">
       <!-- 可替換背景圖片 -->
       <div class="machine-bg absolute inset-0" :class="`machine-bg-${machineStyle}`"></div>
 
@@ -721,7 +716,7 @@ function getRandomColor(index: number) {
 
       <!-- 扭蛋機主體 -->
       <div
-        class="relative z-10"
+        class="relative z-10 overflow-visible"
         :class="{ 'animate-shake-intense': isShaking }"
       >
         <!-- 機器頂蓋 -->
@@ -843,7 +838,7 @@ function getRandomColor(index: number) {
     <!-- 階段三：結果介面 -->
     <div
       v-if="currentPage === 'result'"
-      class="min-h-screen flex flex-col items-center justify-center relative z-10 px-6"
+      class="min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-center relative z-10 px-6"
       :class="`theme-${currentUITheme}`"
     >
       <!-- 背景裝飾 -->
