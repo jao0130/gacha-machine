@@ -250,20 +250,20 @@ function getRandomColor(index: number) {
     <!-- 階段一：輸入介面 -->
     <div
       v-if="currentPage === 'input'"
-      class="min-h-screen flex flex-col items-center justify-center relative z-10 px-4 py-8"
+      class="min-h-screen flex flex-col items-center justify-center relative z-10 px-4 pt-12 pb-24"
       :class="`theme-${currentUITheme}`"
     >
       <!-- 主題切換按鈕 -->
       <el-popover
         :visible="showThemePicker"
-        placement="bottom-end"
+        placement="top-start"
         :width="220"
         trigger="click"
         popper-class="theme-popover"
       >
         <template #reference>
           <el-button
-            class="theme-toggle-btn fixed top-4 right-4 z-20"
+            class="theme-toggle-btn fixed bottom-6 left-4 z-20"
             circle
             size="large"
             @click="showThemePicker = !showThemePicker"
@@ -662,7 +662,7 @@ function getRandomColor(index: number) {
     <!-- 階段三：結果介面 -->
     <div
       v-if="currentPage === 'result'"
-      class="min-h-screen flex flex-col items-center justify-center relative z-10 px-4 py-8"
+      class="min-h-screen flex flex-col items-center justify-center relative z-10 px-4 pt-12 pb-24"
       :class="`theme-${currentUITheme}`"
     >
       <!-- 背景裝飾 -->
