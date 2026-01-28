@@ -702,9 +702,20 @@ function getRandomColor(index: number) {
 
     <!-- 階段二：扭蛋機介面 -->
     <div v-if="currentPage === 'machine'" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 overflow-visible overscroll-none">
-      <!-- iOS 深色主題背景 -->
-      <div class="absolute inset-0 bg-black">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-blue-900/10 rounded-full blur-[100px]"></div>
+      <!-- 扭蛋牆面背景 -->
+      <div class="absolute inset-0 gacha-wall-bg">
+        <!-- 背景卡片網格 -->
+        <div class="absolute inset-0 opacity-15">
+          <div class="grid grid-cols-3 gap-4 p-4 h-full">
+            <div v-for="i in 9" :key="i" class="bg-gradient-to-br from-white/5 to-white/2 rounded-2xl border border-white/10"></div>
+          </div>
+        </div>
+
+        <!-- 聚光燈效果 -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] gacha-spotlight rounded-full blur-3xl"></div>
+
+        <!-- 頂部光暈 -->
+        <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-red-900/20 to-transparent"></div>
       </div>
 
       <!-- 樣式選擇按鈕 -->
@@ -934,6 +945,16 @@ function getRandomColor(index: number) {
 
 <style scoped>
 /* ===== 背景樣式 ===== */
+.gacha-wall-bg {
+  background: linear-gradient(135deg, #1a0a0a 0%, #0a0a1a 50%, #1a0a1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.gacha-spotlight {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 40%, transparent 70%);
+}
+
 .machine-bg {
   background-size: cover;
   background-position: center;
