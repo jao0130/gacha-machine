@@ -364,13 +364,11 @@ function getRandomColor(index: number) {
 
 <template>
   <div class="app-container fixed inset-0 text-white overflow-hidden dark touch-manipulation">
-    <!-- 深暖色背景 - 填滿整個視窗 -->
-    <div class="absolute inset-0 bg-[#0d0b0a]">
-      <!-- 微妙的暖色光暈 -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-900/15 rounded-full blur-[120px]"></div>
-      <div class="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-orange-950/20 rounded-full blur-[100px]"></div>
-      <!-- 噪點紋理 -->
-      <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E');"></div>
+    <!-- iOS 深色背景 -->
+    <div class="absolute inset-0 bg-black">
+      <!-- 微妙的藍色光暈 -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-blue-900/10 rounded-full blur-[100px]"></div>
+      <div class="absolute bottom-0 right-1/4 w-[400px] h-[250px] bg-indigo-950/15 rounded-full blur-[80px]"></div>
     </div>
 
     <!-- 階段一：輸入介面 -->
@@ -418,7 +416,7 @@ function getRandomColor(index: number) {
       <div class="w-full max-w-md mx-auto">
         <!-- 標題區域 -->
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 mb-5 shadow-xl shadow-amber-600/20 overflow-hidden">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-[18px] bg-gradient-to-br from-[#0A84FF] to-[#5E5CE6] mb-5 shadow-lg shadow-blue-500/20 overflow-hidden">
             <!-- 將你的圖片放在 public/icon.png，或修改下方路徑 -->
             <img src="/icon.png" class="w-12 h-12 object-contain" alt="扭蛋機" @error="(e: Event) => (e.target as HTMLImageElement).style.display='none'" />
           </div>
@@ -853,7 +851,7 @@ function getRandomColor(index: number) {
       <div class="w-full max-w-md mx-auto text-center">
         <!-- 成功圖標 -->
         <div class="mb-8 animate-fade-in">
-          <div class="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 mb-6 shadow-xl shadow-orange-600/25 animate-pulse-slow">
+          <div class="inline-flex items-center justify-center w-24 h-24 rounded-[20px] bg-gradient-to-br from-[#30D158] to-[#34C759] mb-6 shadow-lg shadow-green-500/20 animate-pulse-slow">
             <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
             </svg>
@@ -1917,50 +1915,53 @@ function getRandomColor(index: number) {
   font-size: 14px !important;
 }
 
-/* 標題樣式 - 暖色金橘漸層 */
+/* 標題樣式 - iOS 風格 */
 .title-text {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-/* 主卡片 - 暖色調 */
+/* 主卡片 - iOS 深色風格 */
 .main-card {
-  background: rgba(30, 25, 22, 0.8) !important;
-  border: 1px solid rgba(251, 191, 36, 0.1) !important;
-  border-radius: 20px !important;
-  backdrop-filter: blur(10px);
+  background: rgba(28, 28, 30, 0.95) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .main-card :deep(.el-card__header) {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(251, 191, 36, 0.08);
+  padding: 16px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
 .main-card :deep(.el-card__body) {
-  padding: 20px;
+  padding: 16px;
 }
 
-/* 操作按鈕 - 暖色調 */
+/* 操作按鈕 - iOS 深色風格 */
 .action-btn {
-  height: 52px !important;
+  height: 50px !important;
   min-height: 44px !important;
-  font-size: 15px !important;
+  font-size: 16px !important;
   font-weight: 500 !important;
-  border-radius: 14px !important;
-  background: rgba(30, 25, 22, 0.8) !important;
-  border: 1px solid rgba(251, 191, 36, 0.15) !important;
-  transition: all 0.2s ease-out !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif !important;
+  border-radius: 8px !important;
+  background: rgba(44, 44, 46, 0.9) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  color: #0A84FF !important;
+  transition: all 0.15s ease-out !important;
 }
 
 .action-btn:hover:not(:disabled) {
-  background: rgba(251, 191, 36, 0.1) !important;
-  border-color: rgba(251, 191, 36, 0.25) !important;
+  background: rgba(58, 58, 60, 0.95) !important;
 }
 
 .action-btn:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(0.97);
+  background: rgba(68, 68, 70, 1) !important;
 }
 
 /* 選項數量標籤 */
@@ -1999,101 +2000,109 @@ function getRandomColor(index: number) {
   box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important;
 }
 
-/* 大型開始按鈕 - 暖色漸層 */
+/* 大型開始按鈕 - iOS 主要按鈕 */
 .start-btn-large {
-  height: 60px !important;
+  height: 50px !important;
   min-height: 44px !important;
   font-size: 17px !important;
   font-weight: 600 !important;
-  border-radius: 16px !important;
-  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif !important;
+  border-radius: 8px !important;
+  background: #0A84FF !important;
   border: none !important;
-  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.3) !important;
-  transition: all 0.2s ease-out !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.15s ease-out !important;
+  color: white !important;
 }
 
 .start-btn-large:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 28px rgba(234, 88, 12, 0.4) !important;
+  background: #0977E5 !important;
 }
 
 .start-btn-large:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
+  transform: scale(0.97);
+  background: #086ACB !important;
 }
 
 .start-btn-large:disabled {
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(10, 132, 255, 0.4) !important;
   box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* 結果頁面標題 - 暖色 */
+/* 結果頁面標題 - iOS 風格 */
 .result-title {
-  color: #fbbf24;
-  text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+  color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
 }
 
-/* 大型結果卡片 - 暖色調 */
+/* 大型結果卡片 - iOS 深色風格 */
 .result-card-large {
-  background: rgba(30, 25, 22, 0.9) !important;
-  border: 2px solid rgba(251, 191, 36, 0.3) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 8px 40px rgba(234, 88, 12, 0.15), 0 0 60px rgba(251, 191, 36, 0.08) !important;
-  backdrop-filter: blur(10px);
+  background: rgba(28, 28, 30, 0.95) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .result-card-large :deep(.el-card__body) {
   padding: 0;
 }
 
-/* 機率標籤 */
+/* 機率標籤 - iOS 風格 */
 .probability-tag {
-  padding: 10px 18px !important;
+  padding: 8px 16px !important;
   font-size: 14px !important;
   height: auto !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(44, 44, 46, 0.8) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif !important;
 }
 
-/* 結果頁操作按鈕 - 暖色調 */
+/* 結果頁操作按鈕 - iOS 風格 */
 .result-action-btn {
-  height: 56px !important;
+  height: 50px !important;
   min-height: 44px !important;
-  border-radius: 14px !important;
+  border-radius: 8px !important;
   font-weight: 600 !important;
-  font-size: 15px !important;
-  transition: all 0.2s ease-out !important;
+  font-size: 16px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif !important;
+  transition: all 0.15s ease-out !important;
 }
 
 .result-action-btn.el-button--primary {
-  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+  background: #0A84FF !important;
   border: none !important;
-  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.25) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  color: white !important;
 }
 
 .result-action-btn.el-button--primary:hover {
-  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35) !important;
+  background: #0977E5 !important;
 }
 
 .result-action-btn:not(.el-button--primary) {
-  background: rgba(30, 25, 22, 0.8) !important;
-  border: 1px solid rgba(251, 191, 36, 0.2) !important;
+  background: rgba(44, 44, 46, 0.9) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  color: #0A84FF !important;
 }
 
 .result-action-btn:not(.el-button--primary):hover {
-  background: rgba(251, 191, 36, 0.1) !important;
-  border-color: rgba(251, 191, 36, 0.3) !important;
+  background: rgba(58, 58, 60, 0.95) !important;
 }
 
 .result-action-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-/* 閃爍星星裝飾 - 暖金色 */
+/* 閃爍星星裝飾 - iOS 藍色 */
 .sparkle {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: #fbbf24;
+  background: #0A84FF;
   border-radius: 50%;
   opacity: 0;
   animation: sparkle-anim 2.5s ease-in-out infinite;
