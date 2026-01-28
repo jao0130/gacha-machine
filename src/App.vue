@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Delete, FolderOpened, DocumentAdd, Promotion, Box, Refresh, EditPen, Brush, Star, MagicStick, Moon, Sunrise } from '@element-plus/icons-vue'
+import { Delete, FolderOpened, DocumentAdd, Promotion, Box, Refresh, EditPen, Brush, Star, MagicStick, Moon, Sunrise, DataLine } from '@element-plus/icons-vue'
 
 // UI 主題風格
 type UITheme = 'default' | 'cyberpunk' | 'minimal' | 'cute'
@@ -26,15 +26,32 @@ const themeIcons = {
 type PageState = 'input' | 'machine' | 'result'
 const currentPage = ref<PageState>('input')
 
-// 輸入的選項
+// 輸入的選項（支援換行、中文逗號、英文逗號分隔）
 const inputText = ref('')
 const options = computed(() => {
   return inputText.value
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
+    .split(/[\n,，]/)
+    .map(item => item.trim())
+    .filter(item => item.length > 0)
 })
 const optionCount = computed(() => options.value.length)
+
+// 機率分布統計
+const showProbabilityDialog = ref(false)
+const probabilityDistribution = computed(() => {
+  const counts: Record<string, number> = {}
+  options.value.forEach(opt => {
+    counts[opt] = (counts[opt] || 0) + 1
+  })
+  const total = options.value.length
+  return Object.entries(counts)
+    .map(([name, count]) => ({
+      name,
+      count,
+      percentage: total > 0 ? ((count / total) * 100).toFixed(2) : '0'
+    }))
+    .sort((a, b) => b.count - a.count)
+})
 
 // ===== 存檔功能 =====
 interface SavedPreset {
@@ -64,30 +81,112 @@ function loadPresetsFromStorage() {
   }
 }
 
-// 建立預設存檔（一番賞）
-function createDefaultPreset() {
-  const DEFAULT_PRESET_ID = 'default-ichiban-kuji'
-  const exists = savedPresets.value.some(p => p.id === DEFAULT_PRESET_ID)
-  if (!exists) {
-    const prizes: string[] = []
-    // 1 個 A賞
-    prizes.push('A賞')
-    // 20 個 B賞
-    for (let i = 0; i < 20; i++) prizes.push('B賞')
-    // 50 個 C賞
-    for (let i = 0; i < 50; i++) prizes.push('C賞')
-    // 200 個 E賞
-    for (let i = 0; i < 200; i++) prizes.push('E賞')
-    // 1000 個 F賞
-    for (let i = 0; i < 1000; i++) prizes.push('F賞')
+// 建立預設存檔
+function createDefaultPresets() {
+  let hasChanges = false
 
-    const preset: SavedPreset = {
-      id: DEFAULT_PRESET_ID,
+  // 一番賞
+  if (!savedPresets.value.some(p => p.id === 'default-ichiban-kuji')) {
+    const prizes: string[] = ['A賞']
+    for (let i = 0; i < 20; i++) prizes.push('B賞')
+    for (let i = 0; i < 50; i++) prizes.push('C賞')
+    for (let i = 0; i < 200; i++) prizes.push('E賞')
+    for (let i = 0; i < 1000; i++) prizes.push('F賞')
+    savedPresets.value.push({
+      id: 'default-ichiban-kuji',
       name: '一番賞',
       options: prizes.join('\n'),
       createdAt: Date.now()
-    }
-    savedPresets.value.push(preset)
+    })
+    hasChanges = true
+  }
+
+  // 台北捷運
+  if (!savedPresets.value.some(p => p.id === 'default-taipei-mrt')) {
+    const mrtStations = [
+      // 文湖線
+      '動物園', '木柵', '萬芳社區', '萬芳醫院', '辛亥', '麟光', '六張犁', '科技大樓', '大安', '忠孝復興', '南京復興', '中山國中', '松山機場', '大直', '劍南路', '西湖', '港墘', '文德', '內湖', '大湖公園', '葫洲', '東湖', '南港軟體園區', '南港展覽館',
+      // 淡水信義線
+      '淡水', '紅樹林', '竹圍', '關渡', '忠義', '復興崗', '北投', '新北投', '奇岩', '唭哩岸', '石牌', '明德', '芝山', '士林', '劍潭', '圓山', '民權西路', '雙連', '中山', '台北車站', '台大醫院', '中正紀念堂', '東門', '大安森林公園', '信義安和', '台北101/世貿', '象山',
+      // 松山新店線
+      '松山', '南京三民', '台北小巨蛋', '南京復興', '松江南京', '中山', '北門', '西門', '小南門', '中正紀念堂', '古亭', '台電大樓', '公館', '萬隆', '景美', '大坪林', '七張', '新店區公所', '新店',
+      // 中和新蘆線
+      '南勢角', '景安', '永安市場', '頂溪', '古亭', '東門', '忠孝新生', '松江南京', '行天宮', '中山國小', '民權西路', '大橋頭', '台北橋', '菜寮', '三重', '先嗇宮', '頭前庄', '新莊', '輔大', '丹鳳', '迴龍', '三重國小', '三和國中', '徐匯中學', '三民高中', '蘆洲',
+      // 板南線
+      '頂埔', '永寧', '土城', '海山', '亞東醫院', '府中', '板橋', '新埔', '江子翠', '龍山寺', '西門', '台北車站', '善導寺', '忠孝新生', '忠孝復興', '忠孝敦化', '國父紀念館', '市政府', '永春', '後山埤', '昆陽', '南港', '南港展覽館',
+      // 環狀線
+      '新北產業園區', '幸福', '中原', '橋和', '中和', '景安', '景平', '秀朗橋', '十四張', '大坪林', '新店區公所', '板橋', '板新', '頭前庄'
+    ]
+    // 去重
+    const uniqueStations = [...new Set(mrtStations)]
+    savedPresets.value.push({
+      id: 'default-taipei-mrt',
+      name: '台北捷運',
+      options: uniqueStations.join('\n'),
+      createdAt: Date.now()
+    })
+    hasChanges = true
+  }
+
+  // 雙北去哪玩
+  if (!savedPresets.value.some(p => p.id === 'default-taipei-attractions')) {
+    const attractions = [
+      // 台北市景點
+      '台北101', '國父紀念館', '中正紀念堂', '龍山寺', '行天宮', '故宮博物院', '士林夜市', '饒河夜市', '寧夏夜市', '師大夜市', '公館夜市', '通化夜市', '華西街夜市', '延三夜市', '南機場夜市',
+      '象山步道', '陽明山國家公園', '擎天崗', '竹子湖', '小油坑', '冷水坑', '七星山', '大屯山', '紗帽山', '軍艦岩', '劍潭山', '虎山步道', '四獸山', '仙跡岩', '福州山',
+      '台北市立動物園', '貓空纜車', '台北兒童新樂園', '美麗華摩天輪', '台北探索館', '袖珍博物館', '台北當代藝術館', '北投溫泉博物館', '台北市立美術館', '國立台灣博物館',
+      '西門町', '東區', '信義區', '永康街', '迪化街', '大稻埕', '華山1914', '松山文創園區', '台北植物園', '大安森林公園', '二二八和平公園', '青年公園', '榮星花園', '內湖碧山巖',
+      '北投圖書館', '北投地熱谷', '北投溫泉', '新北投', '關渡自然公園', '關渡宮', '淡水老街', '漁人碼頭', '紅毛城', '淡水渡船頭', '八里左岸', '十三行博物館',
+      '台北小巨蛋', '台北流行音樂中心', '國家音樂廳', '國家戲劇院', '台北市政府', '松山車站', '台北車站', '西門紅樓', '總統府', '監察院',
+      '士林官邸', '芝山岩', '天母運動公園', '天母棒球場', '台北天文館', '科教館', '兒童新樂園', '美崙公園', '雙溪公園', '至善園',
+      '南港展覽館', '南港車站', '中研院', '胡適紀念館', '內湖科學園區', '大湖公園', '白石湖吊橋', '碧山巖', '金面山步道',
+      // 新北市景點
+      '九份老街', '金瓜石', '黃金博物館', '陰陽海', '十三層遺址', '報時山步道', '茶壺山', '黃金瀑布', '水湳洞', '南雅奇岩',
+      '平溪老街', '十分老街', '十分瀑布', '猴硐貓村', '菁桐老街', '望古瀑布', '嶺腳瀑布', '平溪天燈', '深坑老街', '深坑豆腐',
+      '烏來老街', '烏來瀑布', '烏來台車', '烏來溫泉', '內洞國家森林遊樂區', '福山部落', '雲仙樂園', '加九寮步道',
+      '野柳地質公園', '女王頭', '萬里蟹', '龜吼漁港', '翡翠灣', '白沙灣', '石門洞', '富貴角燈塔', '老梅綠石槽', '金山老街', '朱銘美術館', '法鼓山',
+      '淡水漁人碼頭', '情人橋', '淡海輕軌', '紅毛城', '真理大學', '淡江中學', '小白宮', '滬尾砲台', '一滴水紀念館', '淡水海關碼頭',
+      '三峽老街', '三峽祖師廟', '鳶山步道', '滿月圓國家森林遊樂區', '大板根森林', '皇后鎮森林', '熊空茶園',
+      '鶯歌老街', '鶯歌陶瓷博物館', '三鶯之心', '鶯歌石步道', '永吉公園', '大漢溪自行車道',
+      '板橋林家花園', '板橋435藝文特區', '新板特區', '板橋大遠百', '板橋車站', '蝴蝶公園', '浮洲藝術河濱公園',
+      '八里渡船頭', '八里左岸', '十三行博物館', '挖子尾自然保護區', '廖添丁廟', '八里老街',
+      '碧潭風景區', '碧潭吊橋', '和美山步道', '新店溪自行車道', '小獅山步道', '銀河洞瀑布',
+      '樹林大同山', '青龍嶺', '樹林興仁花園夜市', '山佳車站', '鹿角溪人工濕地',
+      '土城桐花公園', '土城承天禪寺', '太極嶺步道', '土城媽祖田', '清水登山步道',
+      '新莊廟街', '新莊老街', '新莊體育館', '中港大排', '塭仔底濕地公園', '新莊運動公園',
+      '蘆洲李氏古宅', '蘆洲湧蓮寺', '微風運河', '成蘆橋', '蘆洲夜市',
+      '汐止星光橋', '汐止拱北殿', '新山夢湖', '大尖山步道', '汐止老街', '金龍湖',
+      '瑞芳車站', '瑞芳老街', '瑞芳美食街', '猴硐煤礦博物園區', '三貂嶺瀑布群', '龍洞灣岬步道',
+      '福隆海水浴場', '舊草嶺隧道', '三貂角燈塔', '卯澳漁村', '馬崗漁村', '龍門露營區',
+      '貢寮海洋音樂祭', '澳底海鮮', '龍洞四季灣', '龍洞攀岩場', '鼻頭角步道', '南子吝步道',
+      '雙溪老街', '雙溪車站', '虎豹潭', '坪林老街', '坪林茶業博物館', '坪林觀魚步道',
+      '林口三井Outlet', '林口長庚', '林口運動公園', '林口水牛坑', '太平嶺步道',
+      '泰山明志書院', '泰山巖', '義學坑步道', '辭修公園', '楓樹河濱公園',
+      '五股觀音山', '凌雲禪寺', '硬漢嶺步道', '水碓觀景公園', '五股坑溪步道',
+      '中和烘爐地', '圓通禪寺', '員山公園', '錦和運動公園', '華新街緬甸街',
+      '永和樂華夜市', '永和仁愛公園', '世界宗教博物館', '四號公園', '永和豆漿',
+      '三重三和夜市', '三重碧華寺', '空軍三重一村', '三重幸福水漾公園', '鴨鴨公園',
+      '瀑布公園', '中央藝文公園', '新北大都會公園', '幸運草地景', '辰光橋', '陽光運動公園',
+      '石碇老街', '石碇千島湖', '鱷魚島', '八卦茶園', '淡蘭古道', '許家麵線',
+      '汐止大尖山', '姜子寮絕壁步道', '白雲寺', '秀峰瀑布', '茄苳瀑布',
+      '貢寮九孔', '卯澳石頭屋', '田寮洋濕地', '隆隆車站', '東北角海岸',
+      '石門風箏公園', '石門婚紗廣場', '劉家肉粽', '石門水庫', '青山瀑布步道',
+      '三芝櫻花道', '三芝淺水灣', '三芝遊客中心', '源興居', '三芝貝殼廟',
+      '萬里溫泉', '萬里飛行傘', '萬里海灘', '野柳海洋世界', '萬里蟹季',
+      '雙溪不厭亭', '五分山步道', '十分風景區', '眼鏡洞瀑布', '嶺腳車站',
+      '猴硐礦工紀念館', '瑞三礦業', '運煤橋', '猴硐神社', '願景館',
+      '金山溫泉', '金山鴨肉', '獅頭山公園', '燭台雙嶼', '跳石海岸', '水尾漁港'
+    ]
+    savedPresets.value.push({
+      id: 'default-taipei-attractions',
+      name: '雙北去哪玩',
+      options: attractions.join('\n'),
+      createdAt: Date.now()
+    })
+    hasChanges = true
+  }
+
+  if (hasChanges) {
     savePresetsToStorage()
   }
 }
@@ -145,7 +244,7 @@ function formatDate(timestamp: number): string {
 // 初始化時載入存檔
 onMounted(() => {
   loadPresetsFromStorage()
-  createDefaultPreset()
+  createDefaultPresets()
 })
 
 // 動畫狀態
@@ -351,12 +450,12 @@ function getRandomColor(index: number) {
             v-model="inputText"
             type="textarea"
             :rows="8"
-            placeholder="每行輸入一個選項，例如：
+            placeholder="輸入選項（換行或逗號分隔）
+例如：選項1, 選項2, 選項3
+或
 今天吃什麼
 看電影
-打遊戲
-睡覺
-出門走走"
+打遊戲"
             class="custom-textarea-large"
             resize="none"
           />
@@ -375,24 +474,33 @@ function getRandomColor(index: number) {
         <!-- 底部操作區 - 置中 -->
         <div class="space-y-4">
           <!-- 存檔操作列 -->
-          <div class="flex justify-center gap-4">
+          <div class="flex justify-center gap-3">
             <el-button
               size="default"
-              class="action-btn flex-1 max-w-[140px]"
+              class="action-btn flex-1 max-w-[100px]"
               @click="showLoadDialog = true"
             >
-              <el-icon class="mr-1" :size="16"><FolderOpened /></el-icon>
+              <el-icon class="mr-1" :size="14"><FolderOpened /></el-icon>
               載入
               <el-badge v-if="savedPresets.length > 0" :value="savedPresets.length" class="ml-1" type="warning" />
             </el-button>
             <el-button
               size="default"
-              class="action-btn flex-1 max-w-[140px]"
+              class="action-btn flex-1 max-w-[100px]"
               :disabled="optionCount < 1"
               @click="showSaveDialog = true"
             >
-              <el-icon class="mr-1" :size="16"><DocumentAdd /></el-icon>
+              <el-icon class="mr-1" :size="14"><DocumentAdd /></el-icon>
               儲存
+            </el-button>
+            <el-button
+              size="default"
+              class="action-btn flex-1 max-w-[100px]"
+              :disabled="optionCount < 1"
+              @click="showProbabilityDialog = true"
+            >
+              <el-icon class="mr-1" :size="14"><DataLine /></el-icon>
+              機率
             </el-button>
           </div>
 
@@ -516,6 +624,50 @@ function getRandomColor(index: number) {
 
         <template #footer>
           <el-button @click="showLoadDialog = false">關閉</el-button>
+        </template>
+      </el-dialog>
+
+      <!-- 機率分布對話框 -->
+      <el-dialog
+        v-model="showProbabilityDialog"
+        title="機率分布"
+        width="90%"
+        :style="{ maxWidth: '450px' }"
+        class="custom-dialog"
+      >
+        <template #header>
+          <div class="flex items-center gap-2">
+            <el-icon><DataLine /></el-icon>
+            <span>機率分布（共 {{ optionCount }} 個選項）</span>
+          </div>
+        </template>
+
+        <el-empty v-if="probabilityDistribution.length === 0" description="請先輸入選項">
+          <template #image>
+            <el-icon :size="60" color="#909399"><DataLine /></el-icon>
+          </template>
+        </el-empty>
+
+        <div v-else class="probability-list max-h-[60vh] overflow-y-auto">
+          <el-table :data="probabilityDistribution" style="width: 100%" size="small">
+            <el-table-column prop="name" label="選項" min-width="120">
+              <template #default="{ row }">
+                <span class="font-medium">{{ row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="count" label="數量" width="70" align="center" />
+            <el-table-column prop="percentage" label="機率" width="90" align="center">
+              <template #default="{ row }">
+                <el-tag size="small" :type="parseFloat(row.percentage) > 10 ? 'success' : parseFloat(row.percentage) > 1 ? 'warning' : 'info'">
+                  {{ row.percentage }}%
+                </el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
+        <template #footer>
+          <el-button @click="showProbabilityDialog = false">關閉</el-button>
         </template>
       </el-dialog>
     </div>
