@@ -398,16 +398,16 @@ function getRandomColor(index: number) {
           </el-button>
         </template>
         <div class="theme-picker-content">
-          <p class="text-sm text-gray-400 mb-3 font-medium">選擇風格</p>
-          <div class="space-y-2">
+          <p class="text-sm text-gray-400 mb-4 font-medium">選擇風格</p>
+          <div class="space-y-3">
             <el-button
               v-for="theme in uiThemes"
               :key="theme.id"
-              class="w-full theme-option-btn"
+              class="w-full theme-option-btn min-h-[44px]"
               :type="currentUITheme === theme.id ? 'primary' : 'default'"
               @click="currentUITheme = theme.id; showThemePicker = false"
             >
-              <el-icon class="mr-2" :size="16"><component :is="themeIcons[theme.id]" /></el-icon>
+              <el-icon class="mr-2" :size="18"><component :is="themeIcons[theme.id]" /></el-icon>
               {{ theme.name }}
             </el-button>
           </div>
@@ -470,32 +470,32 @@ function getRandomColor(index: number) {
         </el-card>
 
         <!-- 存檔操作列 -->
-        <div class="flex justify-center gap-3 mt-6 mb-6">
+        <div class="flex justify-center gap-4 mt-8 mb-8">
           <el-button
             size="default"
-            class="action-btn flex-1 max-w-[100px]"
+            class="action-btn flex-1 max-w-[110px] min-h-[44px]"
             @click="showLoadDialog = true"
           >
-            <el-icon class="mr-1" :size="14"><FolderOpened /></el-icon>
+            <el-icon class="mr-1" :size="16"><FolderOpened /></el-icon>
             載入
             <el-badge v-if="savedPresets.length > 0" :value="savedPresets.length" class="ml-1" type="warning" />
           </el-button>
           <el-button
             size="default"
-            class="action-btn flex-1 max-w-[100px]"
+            class="action-btn flex-1 max-w-[110px] min-h-[44px]"
             :disabled="optionCount < 1"
             @click="showSaveDialog = true"
           >
-            <el-icon class="mr-1" :size="14"><DocumentAdd /></el-icon>
+            <el-icon class="mr-1" :size="16"><DocumentAdd /></el-icon>
             儲存
           </el-button>
           <el-button
             size="default"
-            class="action-btn flex-1 max-w-[100px]"
+            class="action-btn flex-1 max-w-[110px] min-h-[44px]"
             :disabled="optionCount < 1"
             @click="showProbabilityDialog = true"
           >
-            <el-icon class="mr-1" :size="14"><DataLine /></el-icon>
+            <el-icon class="mr-1" :size="16"><DataLine /></el-icon>
             機率
           </el-button>
         </div>
@@ -694,13 +694,13 @@ function getRandomColor(index: number) {
         v-if="showStylePicker"
         class="absolute top-16 right-4 z-30 p-3 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl"
       >
-        <p class="text-xs text-gray-400 mb-2 px-1">選擇扭蛋機樣式</p>
-        <div class="flex flex-col gap-2">
+        <p class="text-xs text-gray-400 mb-3 px-1">選擇扭蛋機樣式</p>
+        <div class="flex flex-col gap-3">
           <button
             v-for="style in machineStyles"
             :key="style.id"
             @click="selectStyle(style.id)"
-            class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-left"
+            class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-left min-h-[52px]"
             :class="machineStyle === style.id
               ? 'bg-white/20 border border-white/30'
               : 'hover:bg-white/10'"
@@ -878,22 +878,22 @@ function getRandomColor(index: number) {
         </div>
 
         <!-- 操作按鈕 - 置中對齊 -->
-        <div class="flex justify-center gap-5">
+        <div class="flex justify-center gap-6">
           <el-button
             type="primary"
-            size="default"
-            class="result-action-btn flex-1 max-w-[150px]"
+            size="large"
+            class="result-action-btn flex-1 max-w-[160px] min-h-[48px]"
             @click="spinAgain"
           >
-            <el-icon class="mr-1" :size="16"><Refresh /></el-icon>
+            <el-icon class="mr-2" :size="18"><Refresh /></el-icon>
             <span class="font-semibold">再抽一次</span>
           </el-button>
           <el-button
-            size="default"
-            class="result-action-btn flex-1 max-w-[150px]"
+            size="large"
+            class="result-action-btn flex-1 max-w-[160px] min-h-[48px]"
             @click="editOptions"
           >
-            <el-icon class="mr-1" :size="16"><EditPen /></el-icon>
+            <el-icon class="mr-2" :size="18"><EditPen /></el-icon>
             <span class="font-semibold">修改選項</span>
           </el-button>
         </div>
