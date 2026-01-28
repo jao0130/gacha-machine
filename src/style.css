@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gacha-gold: #FFD700;
+  --color-gacha-pink: #FF69B4;
+  --color-gacha-purple: #9B59B6;
+
+  --animate-shake: shake 0.6s ease-in-out;
+  --animate-bounce-in: bounceIn 0.8s ease-out;
+  --animate-pop: pop 0.5s ease-out;
+  --animate-float: float 3s ease-in-out infinite;
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-3deg); }
+    20%, 40%, 60%, 80% { transform: translateX(10px) rotate(3deg); }
+  }
+
+  @keyframes bounceIn {
+    0% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+    50% { transform: translateY(30px) scale(1.1); }
+    70% { transform: translateY(-15px) scale(0.95); }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+/* 禁止長按選取 */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* 自訂滾動條 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.5);
+  border-radius: 3px;
+}
+
+/* 扭蛋球漸層 */
+.capsule-gradient {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 50%, #ff6b6b 100%);
+}
+
+.capsule-gradient-blue {
+  background: linear-gradient(135deg, #4ecdc4 0%, #7ee8e2 50%, #4ecdc4 100%);
+}
+
+.capsule-gradient-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #a855f7 100%);
+}
+
+.capsule-gradient-yellow {
+  background: linear-gradient(135deg, #fbbf24 0%, #fcd34d 50%, #fbbf24 100%);
+}
+
+.capsule-gradient-green {
+  background: linear-gradient(135deg, #22c55e 0%, #4ade80 50%, #22c55e 100%);
+}
+
+.capsule-gradient-pink {
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #ec4899 100%);
+}
+
+/* 光澤效果 */
+.shine::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 30%;
+  height: 30%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.8) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* 動畫 classes */
+.animate-shake {
+  animation: shake 0.6s ease-in-out;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.8s ease-out;
+}
+
+.animate-pop {
+  animation: pop 0.5s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 更劇烈的震動動畫 */
+@keyframes shake-intense {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  10% { transform: translateX(-12px) rotate(-4deg); }
+  20% { transform: translateX(12px) rotate(4deg); }
+  30% { transform: translateX(-10px) rotate(-3deg); }
+  40% { transform: translateX(10px) rotate(3deg); }
+  50% { transform: translateX(-8px) rotate(-2deg); }
+  60% { transform: translateX(8px) rotate(2deg); }
+  70% { transform: translateX(-6px) rotate(-1deg); }
+  80% { transform: translateX(6px) rotate(1deg); }
+  90% { transform: translateX(-3px) rotate(0deg); }
+}
+
+.animate-shake-intense {
+  animation: shake-intense 0.8s ease-in-out;
+}
+
+/* 隨機漂浮動畫 */
+@keyframes float-random {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-6px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(2deg);
+  }
+}
+
+.animate-float-random {
+  animation: float-random 2.5s ease-in-out infinite;
+}
+
+/* 扭蛋從出口掉出 */
+@keyframes capsule-exit {
+  0% {
+    transform: translateX(-50%) translateY(-10px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-50%) translateY(5px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(15px);
+    opacity: 1;
+  }
+}
+
+.animate-capsule-exit {
+  animation: capsule-exit 0.3s ease-out forwards;
+}
+
+/* 扭蛋掉落動畫 */
+@keyframes capsule-drop {
+  0% {
+    transform: translate(-50%, -200%) scale(0.3);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -40%) scale(0.95);
+  }
+  60% {
+    transform: translate(-50%, -55%) scale(1.05);
+  }
+  80% {
+    transform: translate(-50%, -48%) scale(0.98);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* 結果彈出動畫 */
+@keyframes result-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-result-pop {
+  animation: result-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 淡入動畫 */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
