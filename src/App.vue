@@ -267,6 +267,35 @@ const machineStyles = [
   { id: 'retro' as MachineStyle, name: '復古綠', icon: '💚', desc: '懷舊復古風' },
 ]
 
+// 扭蛋球有機排列位置（模擬自然堆疊效果）
+const ballPositions = [
+  // 頂層球
+  { x: 35, y: 12, size: 42, z: 10 },
+  { x: 52, y: 8, size: 38, z: 11 },
+  { x: 68, y: 14, size: 40, z: 9 },
+  // 第二層
+  { x: 22, y: 22, size: 44, z: 8 },
+  { x: 42, y: 26, size: 46, z: 12 },
+  { x: 60, y: 24, size: 42, z: 7 },
+  { x: 78, y: 20, size: 38, z: 6 },
+  // 第三層
+  { x: 15, y: 38, size: 48, z: 5 },
+  { x: 32, y: 42, size: 44, z: 13 },
+  { x: 50, y: 40, size: 50, z: 14 },
+  { x: 68, y: 38, size: 46, z: 4 },
+  { x: 82, y: 36, size: 40, z: 3 },
+  // 第四層
+  { x: 20, y: 55, size: 46, z: 15 },
+  { x: 38, y: 58, size: 48, z: 16 },
+  { x: 56, y: 56, size: 44, z: 2 },
+  { x: 74, y: 54, size: 42, z: 1 },
+  // 底層
+  { x: 28, y: 72, size: 50, z: 17 },
+  { x: 48, y: 74, size: 46, z: 18 },
+  { x: 66, y: 70, size: 44, z: 19 },
+  { x: 80, y: 68, size: 40, z: 20 },
+]
+
 // 使用加密隨機數確保真正隨機（無規律）
 function getSecureRandomIndex(max: number): number {
   if (window.crypto && window.crypto.getRandomValues) {
@@ -420,15 +449,31 @@ function getRandomColor(index: number) {
             <!-- 將你的圖片放在 public/icon.png，或修改下方路徑 -->
             <img src="/icon.png" class="w-12 h-12 object-contain" alt="扭蛋機" @error="(e: Event) => (e.target as HTMLImageElement).style.display='none'" />
           </div>
-          <h1 class="text-4xl font-bold mb-3 title-text tracking-tight">幸運扭蛋機</h1>
-          <p class="text-neutral-500 text-lg">輸入選項，讓命運決定</p>
+          <h1 class="text-4xl font-bold mb-3 title-text tracking-tight">GACHA</h1>
+          <!-- 機率查看連結 -->
+          <button
+            v-if="optionCount >= 1"
+            @click="showProbabilityDialog = true"
+            class="text-neutral-500 text-sm flex items-center gap-1 hover:text-neutral-300 transition-colors"
+          >
+            <el-icon :size="14"><DataLine /></el-icon>
+            查看機率分布
+          </button>
         </div>
 
         <!-- 卡片內容區 -->
         <el-card class="main-card mb-6" shadow="never">
           <template #header>
             <div class="flex justify-between items-center">
-              <span class="text-base font-medium text-neutral-300">選項列表</span>
+              <span class="text-base font-medium text-neutral-300 flex items-center gap-2">
+                選項列表
+                <el-tooltip
+                  content="支援換行、中文逗號、英文逗號分隔"
+                  placement="top"
+                >
+                  <span class="w-5 h-5 rounded-full bg-neutral-700 text-neutral-400 text-xs flex items-center justify-center cursor-help hover:bg-neutral-600 transition-colors">?</span>
+                </el-tooltip>
+              </span>
               <el-tag
                 size="default"
                 :type="optionCount >= 2 ? 'success' : 'warning'"
@@ -471,7 +516,7 @@ function getRandomColor(index: number) {
         <div class="flex justify-center gap-4 mt-8 mb-8">
           <el-button
             size="default"
-            class="action-btn flex-1 max-w-[110px] min-h-[44px]"
+            class="action-btn-white flex-1 max-w-[140px] min-h-[44px]"
             @click="showLoadDialog = true"
           >
             <el-icon class="mr-1" :size="16"><FolderOpened /></el-icon>
@@ -480,21 +525,12 @@ function getRandomColor(index: number) {
           </el-button>
           <el-button
             size="default"
-            class="action-btn flex-1 max-w-[110px] min-h-[44px]"
+            class="action-btn-white flex-1 max-w-[140px] min-h-[44px]"
             :disabled="optionCount < 1"
             @click="showSaveDialog = true"
           >
             <el-icon class="mr-1" :size="16"><DocumentAdd /></el-icon>
             儲存
-          </el-button>
-          <el-button
-            size="default"
-            class="action-btn flex-1 max-w-[110px] min-h-[44px]"
-            :disabled="optionCount < 1"
-            @click="showProbabilityDialog = true"
-          >
-            <el-icon class="mr-1" :size="16"><DataLine /></el-icon>
-            機率
           </el-button>
         </div>
 
@@ -502,11 +538,10 @@ function getRandomColor(index: number) {
         <el-button
           type="primary"
           size="default"
-          class="w-full start-btn-large"
+          class="w-full start-btn-gray"
           :disabled="optionCount < 2"
           @click="startMachine"
         >
-          <el-icon class="mr-2" :size="18"><Promotion /></el-icon>
           <span class="font-bold">開始抽獎</span>
         </el-button>
       </div>
@@ -667,24 +702,17 @@ function getRandomColor(index: number) {
 
     <!-- 階段二：扭蛋機介面 -->
     <div v-if="currentPage === 'machine'" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 overflow-visible overscroll-none">
-      <!-- 可替換背景圖片 -->
-      <div class="machine-bg absolute inset-0" :class="`machine-bg-${machineStyle}`"></div>
-
-      <!-- 聚光燈效果 -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl"
-           :class="{
-             'bg-yellow-400/20': machineStyle === 'classic',
-             'bg-cyan-400/30': machineStyle === 'neon',
-             'bg-pink-400/25': machineStyle === 'candy',
-             'bg-emerald-400/20': machineStyle === 'retro'
-           }"></div>
+      <!-- iOS 深色主題背景 -->
+      <div class="absolute inset-0 bg-black">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-blue-900/10 rounded-full blur-[100px]"></div>
+      </div>
 
       <!-- 樣式選擇按鈕 -->
       <button
         @click="showStylePicker = !showStylePicker"
         class="absolute top-4 right-4 z-20 px-3 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-sm hover:bg-white/20 transition-colors"
       >
-        🎨 換造型
+        🎨 換顏色
       </button>
 
       <!-- 樣式選擇器 -->
@@ -728,16 +756,20 @@ function getRandomColor(index: number) {
           <!-- 內部漸層陰影 -->
           <div class="absolute inset-0 rounded-[12px_12px_0_0] shadow-inner-glass"></div>
 
-          <!-- 扭蛋球們 -->
-          <div class="absolute inset-4 flex flex-wrap justify-center items-center gap-2 content-center overflow-hidden">
+          <!-- 扭蛋球們 - 有機排列 -->
+          <div class="absolute inset-0 overflow-hidden">
             <div
-              v-for="i in Math.min(optionCount, 20)"
+              v-for="(pos, i) in ballPositions.slice(0, Math.min(optionCount, 20))"
               :key="i"
-              class="capsule-ball animate-float-random"
-              :class="getRandomColor(i)"
+              class="capsule-ball-organic animate-float-random"
+              :class="getRandomColor(i + 1)"
               :style="{
-                animationDelay: `${i * 0.12}s`,
-                transform: `rotate(${i * 18}deg)`
+                left: pos.x + '%',
+                top: pos.y + '%',
+                width: pos.size + 'px',
+                height: pos.size + 'px',
+                animationDelay: `${i * 0.15}s`,
+                zIndex: pos.z
               }"
             ></div>
           </div>
@@ -827,7 +859,7 @@ function getRandomColor(index: number) {
         @click="editOptions"
         class="mt-6 px-6 py-2 text-gray-500 hover:text-white transition-colors text-sm relative z-10"
       >
-        ← 修改選項
+        ← BACK
       </button>
     </div>
 
@@ -892,7 +924,7 @@ function getRandomColor(index: number) {
             @click="editOptions"
           >
             <el-icon class="mr-2" :size="18"><EditPen /></el-icon>
-            <span class="font-semibold">修改選項</span>
+            <span class="font-semibold">BACK</span>
           </el-button>
         </div>
       </div>
@@ -1427,6 +1459,77 @@ function getRandomColor(index: number) {
   background: radial-gradient(ellipse, rgba(255,255,255,0.95) 0%, transparent 70%);
   border-radius: 50%;
   z-index: 10;
+}
+
+/* ===== 有機排列扭蛋球 ===== */
+.capsule-ball-organic {
+  position: absolute;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+}
+
+.capsule-ball-organic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.5) 0%,
+    rgba(255,255,255,0.25) 60%,
+    rgba(255,255,255,0.15) 100%
+  );
+  border-radius: 50% 50% 0 0;
+  box-shadow:
+    inset 2px 2px 6px rgba(255,255,255,0.7),
+    inset -1px 0 4px rgba(0,0,0,0.1);
+}
+
+.capsule-ball-organic::after {
+  content: '';
+  position: absolute;
+  top: 8%;
+  left: 18%;
+  width: 35%;
+  height: 22%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.95) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.capsule-ball-organic.capsule-gradient {
+  background: linear-gradient(180deg, transparent 0%, transparent 48%, rgba(200,200,200,0.3) 49%, #ff6b6b 50%, #ff8e8e 65%, #ff6b6b 100%);
+  border: 2px solid rgba(255,107,107,0.4);
+}
+
+.capsule-ball-organic.capsule-gradient-blue {
+  background: linear-gradient(180deg, transparent 0%, transparent 48%, rgba(200,200,200,0.3) 49%, #4ecdc4 50%, #7ee8e2 65%, #4ecdc4 100%);
+  border: 2px solid rgba(78,205,196,0.4);
+}
+
+.capsule-ball-organic.capsule-gradient-purple {
+  background: linear-gradient(180deg, transparent 0%, transparent 48%, rgba(200,200,200,0.3) 49%, #a78bfa 50%, #c4b5fd 65%, #a78bfa 100%);
+  border: 2px solid rgba(167,139,250,0.4);
+}
+
+.capsule-ball-organic.capsule-gradient-green {
+  background: linear-gradient(180deg, transparent 0%, transparent 48%, rgba(200,200,200,0.3) 49%, #34d399 50%, #6ee7b7 65%, #34d399 100%);
+  border: 2px solid rgba(52,211,153,0.4);
+}
+
+.capsule-ball-organic.capsule-gradient-yellow {
+  background: linear-gradient(180deg, transparent 0%, transparent 48%, rgba(200,200,200,0.3) 49%, #fbbf24 50%, #fcd34d 65%, #fbbf24 100%);
+  border: 2px solid rgba(251,191,36,0.4);
+}
+
+.capsule-ball-organic.capsule-gradient-pink {
+  background: linear-gradient(180deg, transparent 0%, transparent 48%, rgba(200,200,200,0.3) 49%, #f472b6 50%, #f9a8d4 65%, #f472b6 100%);
+  border: 2px solid rgba(244,114,182,0.4);
 }
 
 /* 下半部顏色（透過額外的內層元素，但我們用漸層背景模擬） */
@@ -1964,6 +2067,34 @@ function getRandomColor(index: number) {
   background: rgba(68, 68, 70, 1) !important;
 }
 
+/* 操作按鈕 - 白色文字版本 */
+.action-btn-white {
+  height: 50px !important;
+  min-height: 44px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif !important;
+  border-radius: 8px !important;
+  background: rgba(44, 44, 46, 0.9) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  transition: all 0.15s ease-out !important;
+}
+
+.action-btn-white:hover:not(:disabled) {
+  background: rgba(58, 58, 60, 0.95) !important;
+}
+
+.action-btn-white:active:not(:disabled) {
+  transform: scale(0.97);
+  background: rgba(68, 68, 70, 1) !important;
+}
+
+.action-btn-white:disabled {
+  color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(44, 44, 46, 0.5) !important;
+}
+
 /* 選項數量標籤 */
 .option-count-tag {
   padding: 6px 14px !important;
@@ -2028,6 +2159,36 @@ function getRandomColor(index: number) {
   background: rgba(10, 132, 255, 0.4) !important;
   box-shadow: none !important;
   color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 灰色開始按鈕 */
+.start-btn-gray {
+  height: 50px !important;
+  min-height: 44px !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif !important;
+  border-radius: 8px !important;
+  background: rgba(72, 72, 74, 0.95) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.15s ease-out !important;
+  color: white !important;
+}
+
+.start-btn-gray:hover:not(:disabled) {
+  background: rgba(82, 82, 84, 0.95) !important;
+}
+
+.start-btn-gray:active:not(:disabled) {
+  transform: scale(0.97);
+  background: rgba(92, 92, 94, 1) !important;
+}
+
+.start-btn-gray:disabled {
+  background: rgba(72, 72, 74, 0.4) !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* 結果頁面標題 - iOS 風格 */
